@@ -83,8 +83,12 @@ if __name__ == '__main__':
     try:
         LOGGER.info('\nStarting to export OpenVINO...')
         import_file = args.weights.replace('.pt', '.onnx')
-        export_dir = str(import_file).replace('.onnx', '_openvino')
-        cmd = f"mo --input_model {import_file} --output_dir {export_dir} --data_type {'FP16' if args.half else 'FP32'}"
+        if args.half:
+            export_dir = str(import_file).replace('.onnx', '_openvino')
+            cmd = f"mo --input_model {import_file} --output_dir {export_dir}"
+        else:
+            export_dir = str(import_file).replace('.onnx', '_openvino_fp16')
+            cmd = f"mo --input_model {import_file} --output_dir {export_dir} --compress_to_fp16"
         subprocess.check_output(cmd.split())
         LOGGER.info(f'OpenVINO export success, saved as {export_dir}')
     except Exception as e:
